@@ -1,13 +1,53 @@
-const fs = require('fs').promises;
-const path = require('path');
+const url = '../pdf/pdftest.pdf';
 
-const inputEl = document.querySelector('input');
-const buttonEl = document.querySelector('button');
-console.log(buttonEl)
+const canvas = document.querySelector("canvas");
+const ctx = canvas.getContext('2d');
 
-buttonEl.addEventListener("click", saveFile);
+let pdfDocument = null;
 
-async function saveFile(filePath) {
+const scale = 0.5;
+
+renderPDF(url);
+
+function renderPDF(url) {
+    
+    pdfjsLib.getDocument(url).promise.then(pdfDoc => {
+        pdfDocument = pdfDoc;
+
+        renderPage(1)
+    })
+}
+
+const renderPage = num => {
+
+    pdfDocument.getPage(num).then(page => {
+
+        const viewport = page.getViewport({scale})
+        canvas.height = viewport.height;
+        canvas.width = viewport.width;
+
+        const renderCtx = {
+            canvasContext: ctx,
+            viewport
+        }
+
+        page.render(renderCtx).promise.then(() => {
+            console.log('done')
+        })
+    })
 
 }
 
+
+const inputEl = document.querySelector('input');
+
+function onSaveFilen(e) {
+    const fr = new FileReader();
+
+    fr.readAsDataURL(inputEl.files[0]);
+    fr.onload = function (e) {
+        renderPDF(e.srcElement.result)
+    } 
+}
+
+inputEl.addEventListener('change', onSaveFilen);
