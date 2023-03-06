@@ -44,8 +44,11 @@ const inputEl = document.querySelector('input');
 function onSaveFilen(e) {
     const fr = new FileReader();
 
-    fr.readAsDataURL(inputEl.files[0]);
+    // fr.readAsDataURL(inputEl.files[0]);
+
+    fr.readAsArrayBuffer(inputEl.files[0])
     fr.onload = function (e) {
+        console.log(e.srcElement.result)
         renderPDF(e.srcElement.result)
     } 
 }
